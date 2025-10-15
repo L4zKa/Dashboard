@@ -10,6 +10,13 @@ import {
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import "./App.css";
+import Dock from "../components/Dock/Dock";
+import {
+  VscAccount,
+  VscArchive,
+  VscHome,
+  VscSettingsGear,
+} from "react-icons/vsc";
 
 function useWindowSize() {
   const [size, set] = React.useState({
@@ -33,12 +40,34 @@ export default function App() {
   const margin: [number, number] = [10, 10];
 
   const gridWidth = Math.max(0, w);
-  const rowHeight = Math.max(40, Math.floor(h / 14));
+  const rowHeight = Math.max(10, Math.floor(h / 50));
 
   const layout: Layout[] = [
     { i: "a", x: 0, y: 0, w: 4, h: 4, static: false },
     { i: "b", x: 4, y: 0, w: 4, h: 4, static: false },
     { i: "c", x: 8, y: 0, w: 4, h: 4, static: false },
+  ];
+  const items = [
+    {
+      icon: <VscHome size={18} />,
+      label: "Home",
+      onClick: () => alert("Home!"),
+    },
+    {
+      icon: <VscArchive size={18} />,
+      label: "Archive",
+      onClick: () => alert("Archive!"),
+    },
+    {
+      icon: <VscAccount size={18} />,
+      label: "Profile",
+      onClick: () => alert("Profile!"),
+    },
+    {
+      icon: <VscSettingsGear size={18} />,
+      label: "Settings",
+      onClick: () => alert("Settings!"),
+    },
   ];
 
   return (
@@ -87,6 +116,7 @@ export default function App() {
           </CardPreview>
         </Card>
       </GridLayout>
+      <Dock items={items} />
     </div>
   );
 }
