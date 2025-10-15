@@ -5,14 +5,20 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1200,
     height: 800,
-    frame: false, // kein Standard-Fensterrahmen
-    transparent: true, // durchsichtig (kann Widgets drüber legen)
     resizable: true,
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-    },
+
+    //! das hier ist nur zum testen aus
+    /*frame: false, // kein Standard-Fensterrahmen
     alwaysOnTop: false,
     fullscreen: true,
+    transparent: true,
+    
+    titleBarStyle: "hidden",
+    titleBarOverlay: {
+      color: "#ffffff",
+      symbolColor: "#000000",
+      height: 32, 
+    },*/
   });
 
   if (app.isPackaged) {
