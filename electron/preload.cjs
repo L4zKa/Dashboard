@@ -1,5 +1,6 @@
-const { contextBridge } = require("electron");
+// electron/preload.js
+const { contextBridge, ipcRenderer } = require("electron");
 
-contextBridge.exposeInMainWorld("api", {
-  // später kannst du hier sichere Funktionen zwischen Node & React austauschen
+contextBridge.exposeInMainWorld("electronAPI", {
+  onDisplayInfo: (callback) => ipcRenderer.on("display-info", callback),
 });

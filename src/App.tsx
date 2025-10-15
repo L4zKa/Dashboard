@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import GridLayout, { type Layout } from "react-grid-layout";
 import {
   Card,
@@ -17,14 +17,26 @@ import {
   VscHome,
   VscSettingsGear,
 } from "react-icons/vsc";
+import type { DisplayInfoMessage } from "../models/display";
+
+// Extend global window to include your Electron API
+declare global {
+  interface Window {
+    electronAPI: {
+      onDisplayInfo: (
+        callback: (event: unknown, data: DisplayInfoMessage) => void
+      ) => void;
+    };
+  }
+}
 
 function useWindowSize() {
-  const [size, set] = React.useState({
+  const [size, set] = useState({
     w: window.innerWidth,
     h: window.innerHeight,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onResize = () => set({ w: window.innerWidth, h: window.innerHeight });
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
@@ -36,17 +48,28 @@ function useWindowSize() {
 export default function App() {
   const { w, h } = useWindowSize();
 
-  const rows = 35; // Anzahl Zeilen, die du über die volle Höhe willst
+  const rows = 35; // number of grid rows
   const margin: [number, number] = [10, 10];
 
   const gridWidth = Math.max(0, w);
   const rowHeight = Math.max(10, Math.floor(h / 50));
+
+  const [displayInformations, setDisplayInformations] =
+    useState<DisplayInfoMessage>();
+
+  useEffect(() => {
+    window.electronAPI.onDisplayInfo((_, data) => {
+      console.log("📺 Display info:", data);
+      setDisplayInformations(data);
+    });
+  }, []);
 
   const layout: Layout[] = [
     { i: "a", x: 0, y: 0, w: 4, h: 4, static: false },
     { i: "b", x: 4, y: 0, w: 4, h: 4, static: false },
     { i: "c", x: 8, y: 0, w: 4, h: 4, static: false },
   ];
+
   const items = [
     {
       icon: <VscHome size={18} />,
@@ -81,10 +104,10 @@ export default function App() {
         margin={margin}
         isResizable
         isDraggable
-        preventCollision={true}
+        preventCollision
         compactType={null}
-        autoSize={false} // <- verhindert unendliche Containerhöhe
-        maxRows={rows} // <- verhindert rausschieben nach unten
+        autoSize={false}
+        maxRows={rows}
       >
         <Card key="a" className="card">
           <CardHeader>
@@ -116,7 +139,11 @@ export default function App() {
           </CardPreview>
         </Card>
       </GridLayout>
-      <Dock items={items} />
+
+      {/* You’ll fix the line below yourself 😉 */}
+      {displayInformations != undefined &&
+        displayInformations?.currentDisplay.id ==
+          displayInformations?.allDisplays[0].id && <Dock items={items} />}
     </div>
   );
 }
