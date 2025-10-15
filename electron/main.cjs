@@ -1,40 +1,61 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, screen } = require("electron");
 const path = require("path");
 
-function createWindow() {
-  const win = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    resizable: true,
+let windows = [];
 
-    //! das hier ist nur zum testen aus
-    /*frame: false, // kein Standard-Fensterrahmen
-    alwaysOnTop: false,
-    fullscreen: true,
-    transparent: true,
-    
-    titleBarStyle: "hidden",
-    titleBarOverlay: {
-      color: "#ffffff",
-      symbolColor: "#000000",
-      height: 32, 
-    },*/
+function createWindowsOnAllDisplays() {
+  const displays = screen.getAllDisplays();
+
+  // Close any existing windows
+  windows.forEach((win) => win.close());
+  windows = [];
+
+  displays.forEach((display) => {
+    const win = new BrowserWindow({
+      x: display.bounds.x,
+      y: display.bounds.y,
+      width: display.bounds.width,
+      height: display.bounds.height,
+      fullscreen: true,
+      transparent: true,
+      backgroundColor: "#00000000",
+      frame: false,
+      alwaysOnTop: false,
+      skipTaskbar: true,
+      focusable: false,
+      hasShadow: false,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false,
+      },
+    });
+
+    win.setAlwaysOnTop(false, "normal");
+    win.setVisibleOnAllWorkspaces(true);
+
+    if (app.isPackaged) {
+      win.loadFile(path.join(__dirname, "../dist/index.html"));
+    } else {
+      win.loadURL("http://localhost:5173");
+      win.webContents.openDevTools({ mode: "detach" });
+    }
+
+    windows.push(win);
   });
-
-  if (app.isPackaged) {
-    win.loadFile(path.join(__dirname, "../dist/index.html"));
-  } else {
-    win.loadURL("http://localhost:5173");
-    win.webContents.openDevTools({ mode: "detach" });
-  }
 }
 
 app.whenReady().then(() => {
-  createWindow();
+  createWindowsOnAllDisplays();
 
   app.on("activate", () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    if (BrowserWindow.getAllWindows().length === 0)
+      createWindowsOnAllDisplays();
   });
+
+  // Optional: Re-create windows if displays change (e.g., monitor plugged/unplugged)
+  screen.on("display-added", createWindowsOnAllDisplays);
+  screen.on("display-removed", createWindowsOnAllDisplays);
+  screen.on("display-metrics-changed", createWindowsOnAllDisplays);
 });
 
 app.on("window-all-closed", () => {

@@ -6,9 +6,12 @@ import "react-resizable/css/styles.css";
 import { FluentProvider, webDarkTheme } from "@fluentui/react-components";
 
 createRoot(document.getElementById("root")!).render(
-  <div>
-    <FluentProvider theme={webDarkTheme} style={{ background: "transparent" }}>
-      <App />
-    </FluentProvider>
-  </div>
+  <FluentProvider
+    theme={webDarkTheme}
+    style={{
+      background: "transparent",
+    }}
+  >
+    <App />
+  </FluentProvider>
 );

@@ -1,27 +1,17 @@
 html,
-body,
-#root {
-  height: 100%;
+body {
+  background: transparent !important;
+  box-shadow: none !important;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 .app {
   display: flex;
   flex-direction: column;
-  background: #444;
   color: white;
   box-sizing: border-box;
-}
-
-.layout {
-  flex: 1;
+  height: 100vh;
+  width: 100vw;
   overflow: hidden;
-}
-
-.card {
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  background: #222;
 }

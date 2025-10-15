@@ -29,7 +29,7 @@ function useWindowSize() {
 export default function App() {
   const { w, h } = useWindowSize();
 
-  const rows = 12; // Anzahl Zeilen, die du über die volle Höhe willst
+  const rows = 35; // Anzahl Zeilen, die du über die volle Höhe willst
   const margin: [number, number] = [10, 10];
 
   const gridWidth = Math.max(0, w);
@@ -42,18 +42,11 @@ export default function App() {
   ];
 
   return (
-    <div
-      className="app"
-      style={{
-        height: "100vh",
-        width: "100vw",
-        overflow: "hidden", // verhindert Scrollen
-      }}
-    >
+    <div className="app">
       <GridLayout
-        className="layout"
+        style={{ background: "transparent" }}
         layout={layout}
-        cols={12}
+        cols={35}
         width={gridWidth}
         rowHeight={rowHeight}
         margin={margin}
