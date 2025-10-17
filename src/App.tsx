@@ -1,23 +1,13 @@
 import React, { useEffect, useState } from "react";
 import GridLayout, { type Layout } from "react-grid-layout";
-import {
-  Card,
-  CardHeader,
-  CardPreview,
-  CardFooter,
-  Button,
-} from "@fluentui/react-components";
+import { Card, CardHeader, CardPreview } from "@fluentui/react-components";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import "./App.css";
 import Dock from "../components/Dock/Dock";
-import {
-  VscAccount,
-  VscArchive,
-  VscHome,
-  VscSettingsGear,
-} from "react-icons/vsc";
+import { VscEdit } from "react-icons/vsc";
 import type { DisplayInfoMessage } from "../models/display";
+import WeahterWidget from "../components/WeatherWidget/WeatherWidget";
 
 // Extend global window to include your Electron API
 declare global {
@@ -47,15 +37,18 @@ function useWindowSize() {
 
 export default function App() {
   const { w, h } = useWindowSize();
+  const columns = 100;
 
-  const rows = 35; // number of grid rows
+  const rows = 100; // number of grid rows
   const margin: [number, number] = [10, 10];
 
   const gridWidth = Math.max(0, w);
-  const rowHeight = Math.max(10, Math.floor(h / 50));
+  const rowHeight = Math.max(0, Math.floor(h / columns));
 
   const [displayInformations, setDisplayInformations] =
     useState<DisplayInfoMessage>();
+
+  const [gridIsEditable, setGridIsEditable] = useState<boolean>(false);
 
   useEffect(() => {
     window.electronAPI.onDisplayInfo((_, data) => {
@@ -63,47 +56,43 @@ export default function App() {
       setDisplayInformations(data);
     });
   }, []);
-
-  const layout: Layout[] = [
-    { i: "a", x: 0, y: 0, w: 4, h: 4, static: false },
+  const [layout, setLayout] = useState<Layout[]>([
+    { i: "a", x: 0, y: 0, w: 1, h: 1, static: false },
     { i: "b", x: 4, y: 0, w: 4, h: 4, static: false },
-    { i: "c", x: 8, y: 0, w: 4, h: 4, static: false },
-  ];
+    {
+      i: "weatherWidget",
+      x: 10,
+      y: 10,
+      w: 15,
+      h: 13,
+      static: false,
+      isResizable: false,
+    },
+    { i: "d", x: 10, y: 10, w: 15, h: 13, static: false, isResizable: false },
+  ]);
 
   const items = [
     {
-      icon: <VscHome size={18} />,
+      icon: <VscEdit size={18} />,
       label: "Home",
-      onClick: () => alert("Home!"),
-    },
-    {
-      icon: <VscArchive size={18} />,
-      label: "Archive",
-      onClick: () => alert("Archive!"),
-    },
-    {
-      icon: <VscAccount size={18} />,
-      label: "Profile",
-      onClick: () => alert("Profile!"),
-    },
-    {
-      icon: <VscSettingsGear size={18} />,
-      label: "Settings",
-      onClick: () => alert("Settings!"),
+      onClick: () => setGridIsEditable(!gridIsEditable),
     },
   ];
+
+  /*  const blockMeasures = { width: w / columns, heigth: h / rows }; */
 
   return (
     <div className="app">
       <GridLayout
         style={{ background: "transparent" }}
         layout={layout}
-        cols={35}
+        onLayoutChange={setLayout}
+        cols={columns}
         width={gridWidth}
         rowHeight={rowHeight}
         margin={margin}
-        isResizable
-        isDraggable
+        isResizable={gridIsEditable}
+        isDraggable={gridIsEditable}
         preventCollision
         compactType={null}
         autoSize={false}
@@ -113,12 +102,7 @@ export default function App() {
           <CardHeader>
             <b>Card A</b>
           </CardHeader>
-          <CardPreview>
-            <p>Beispiel-Card mit fester Höhe.</p>
-          </CardPreview>
-          <CardFooter>
-            <Button appearance="primary">Aktion</Button>
-          </CardFooter>
+          <CardPreview></CardPreview>
         </Card>
 
         <Card key="b" className="card">
@@ -129,21 +113,32 @@ export default function App() {
             <p>Beweg mich!</p>
           </CardPreview>
         </Card>
-
-        <Card key="c" className="card">
+        <Card key="d" className="card">
           <CardHeader>
-            <b>Card C</b>
+            <b>Card B</b>
           </CardHeader>
           <CardPreview>
-            <p>Auch responsive.</p>
+            <p>Beweg mich!</p>
           </CardPreview>
         </Card>
+
+        <div
+          key="weatherWidget"
+          style={{
+            background: "#91c9db",
+            borderRadius: "50px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          <WeahterWidget />
+        </div>
       </GridLayout>
 
-      {/* You’ll fix the line below yourself 😉 */}
       {displayInformations != undefined &&
         displayInformations?.currentDisplay.id ==
-          displayInformations?.allDisplays[0].id && <Dock items={items} />}
+          displayInformations?.allDisplays[1].id && <Dock items={items} />}
     </div>
   );
 }
